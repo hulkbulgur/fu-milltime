@@ -1,25 +1,25 @@
-﻿namespace FuMilltime2.DataBase
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+
+using FuMilltime2.Controls.ProjectInput;
+
+namespace FuMilltime2.DataBase
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.Linq;
-
-    using FuMilltime2.Controls.ProjectInput;
-
     public class LogFileDataStorage : IFuMilltimeDataSource
     {
-        private static string CreateFileName(DateTime date)
+        private static string CreateFileName(DateOnly date)
         {
             return string.Format("FuMilltime-{0:yyMMdd}.log", date);
         }
 
-        public IReadOnlyList<TimeRecord> GetRecords(DateTime date)
+        public IReadOnlyList<TimeRecord>? GetRecords()
         {
             try
             {
-                var data = File.ReadAllText(CreateFileName(date));
+                var data = File.ReadAllText(CreateFileName(DateManager.CurrentDate));
                 var root = XElement.Parse(data);
 
                 var result = new List<TimeRecord>();
@@ -27,14 +27,14 @@
                 var customerProjects = root.Element("customerProjects");
                 var commonProjects = root.Element("commonProjects");
 
-                foreach (var record in customerProjects.Elements("record"))
+                foreach (var record in customerProjects!.Elements("record"))
                 {
-                    result.Add(new TimeRecord{Name = record.Element("name").Value, TimeStamp = record.Element("timeStamp").Value});
+                    result.Add(new TimeRecord{Name = record.Element("name")!.Value, TimeStamp = record.Element("timeStamp")!.Value});
                 }
 
-                foreach (var record in commonProjects.Elements("record"))
+                foreach (var record in commonProjects!.Elements("record"))
                 {
-                    result.Add(new TimeRecord{Common = true, Name = record.Element("name").Value, TimeStamp = record.Element("timeStamp").Value});
+                    result.Add(new TimeRecord{Common = true, Name = record.Element("name")!.Value, TimeStamp = record.Element("timeStamp")!.Value});
                 }
 
                 return result;
@@ -45,9 +45,9 @@
             }
         }
 
-        public void SaveRecords(DateTime date, IReadOnlyList<TimeRecord> data)
+        public void SaveRecords(IReadOnlyList<TimeRecord> data)
         {
-            var logFileName = CreateFileName(date);
+            var logFileName = CreateFileName(DateManager.CurrentDate);
 
             var root = new XElement("projects");
 

@@ -16,13 +16,13 @@
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>The data stored for the specified date.</returns>
-        IReadOnlyList<TimeRecord> GetRecords(DateTime date);
+        IReadOnlyList<TimeRecord>? GetRecords();
 
         /// <summary>
         /// Sets the data for a specific date.
         /// </summary>
         /// <param name="date">The date.</param>
         /// <param name="data">The data.</param>
-        void SaveRecords(DateTime date, IReadOnlyList<TimeRecord> data);
+        void SaveRecords(IReadOnlyList<TimeRecord> data);
     }
 }
