@@ -12,17 +12,32 @@
         {
             this.InitializeComponent();
             this.AutoSize = true;
+            SetWindowTitle();
             LoadRecordsFromFile();
 
-            DateManager.DateChanged += (_, _) => LoadRecordsFromFile();
+            DateManager.DateChanged += (_, _) =>
+            {
+                SetWindowTitle();
+                LoadRecordsFromFile();
+            };
 
             this.projectInputPanel.DataChanged +=
-                (sender, args) => this.resultGrid.SetData(this.projectInputPanel.GetData());
+                (_, _) => this.resultGrid.SetData(this.projectInputPanel.GetData());
             
             this.projectInputPanel.DataChanged +=
-                (sender, args) => this.datasource.SaveRecords(this.projectInputPanel.GetRecords());
+                (_, _) => this.datasource.SaveRecords(this.projectInputPanel.GetRecords());
+
+
         }
 
+        private void SetWindowTitle()
+        {
+            var dayText = DateManager.CurrentDate == DateOnly.FromDateTime(DateTime.Today)
+                   ? "I dag"
+                   : DateManager.CurrentDate.ToString("d MMMM yyyy");
+
+            this.Text = "FU Milltime 2 - " + dayText;
+        }
         private void LoadRecordsFromFile()
         {
             var currentData = this.datasource.GetRecords();
